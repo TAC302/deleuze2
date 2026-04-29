@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국내 들뢰즈 연구 지형도 대시보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e8e0f0;font-family:'Noto Sans KR',sans-serif;min-height:100vh}
+:root{--purple:#9d6fff;--pink:#e879f9;--blue:#38bdf8;--dark:#0a0a0f;--card:#111118;--border:rgba(157,111,255,0.2)}
+
+header{background:linear-gradient(135deg,#0d0d1a,#1a0d2e);border-bottom:1px solid var(--border);padding:2rem;text-align:center;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at center,rgba(157,111,255,0.08) 0%,transparent 60%);pointer-events:none}
+.logo{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;background:linear-gradient(90deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{color:#a0a0c0;font-size:0.9rem;margin-top:0.4rem;letter-spacing:0.1em}
+
+nav{display:flex;gap:0;border-bottom:1px solid var(--border);background:#0d0d1a;padding:0 2rem;overflow-x:auto}
+.tab{padding:1rem 1.5rem;cursor:pointer;color:#888;font-size:0.9rem;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.3s}
+.tab:hover{color:#ccc}
+.tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+
+.content{display:none;padding:2rem;max-width:1400px;margin:0 auto}
+.content.active{display:block}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;transition:transform 0.2s}
+.stat-card:hover{transform:translateY(-3px)}
+.stat-num{font-size:2.2rem;font-weight:700;background:linear-gradient(90deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{color:#888;font-size:0.8rem;margin-top:0.3rem}
+
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:1.5rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+.card h3{font-size:1rem;color:var(--purple);margin-bottom:1rem;letter-spacing:0.05em}
+
+.period-badge{display:inline-block;padding:0.3rem 0.8rem;border-radius:20px;font-size:0.75rem;margin:0.2rem}
+.p1{background:rgba(56,189,248,0.15);color:var(--blue);border:1px solid rgba(56,189,248,0.3)}
+.p2{background:rgba(157,111,255,0.15);color:var(--purple);border:1px solid var(--border)}
+.p3{background:rgba(232,121,249,0.15);color:var(--pink);border:1px solid rgba(232,121,249,0.3)}
+
+.kw-bar{margin:0.5rem 0}
+.kw-label{display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:0.3rem}
+.kw-track{background:#1e1e2e;border-radius:4px;height:8px}
+.kw-fill{height:8px;border-radius:4px;transition:width 1s ease}
+
+.author-row{display:flex;align-items:center;gap:1rem;padding:0.7rem 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.author-rank{font-size:1.2rem;font-weight:700;color:#333;width:2rem;text-align:center}
+.author-info{flex:1}
+.author-name{font-size:0.9rem;font-weight:500}
+.author-inst{font-size:0.75rem;color:#888;margin-top:0.1rem}
+.author-bar-wrap{width:120px}
+.author-bar{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--purple),var(--pink))}
+
+.insight-box{background:rgba(157,111,255,0.05);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin:1rem 0;font-size:0.88rem;line-height:1.7;color:#ccc}
+.insight-box strong{color:var(--purple)}
+
+img.chart-img{width:100%;border-radius:8px;opacity:0.95}
+
+canvas{max-height:300px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">국내 들뢰즈 연구 지형도</div>
+  <div class="subtitle">KCI 데이터 기반 계량서지학적 분석 · 1995 – 2026</div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('summary')">📊 요약</div>
+  <div class="tab" onclick="switchTab('trend')">📈 연도별 추이</div>
+  <div class="tab" onclick="switchTab('keywords')">🔑 키워드 분석</div>
+  <div class="tab" onclick="switchTab('authors')">👤 저자 네트워크</div>
+  <div class="tab" onclick="switchTab('plan')">🔭 향후 계획</div>
+</nav>
+
+<!-- 요약 탭 -->
+<div id="summary" class="content active">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">1,999</div><div class="stat-label">최종 유효 논문 수</div></div>
+    <div class="stat-card"><div class="stat-num">32년</div><div class="stat-label">분석 기간 (1995–2026)</div></div>
+    <div class="stat-card"><div class="stat-num">159편</div><div class="stat-label">2025년 역대 최다</div></div>
+    <div class="stat-card"><div class="stat-num">2.60%</div><div class="stat-label">키워드 결측률</div></div>
+    <div class="stat-card"><div class="stat-num">5.95%</div><div class="stat-label">초록 결측률</div></div>
+    <div class="stat-card"><div class="stat-num">94~97%</div><div class="stat-label">데이터 충족률</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>시기별 논문 분포</h3>
+      <canvas id="periodChart"></canvas>
+    </div>
+    <div class="card">
+      <h3>3단계 연구 궤적</h3>
+      <div style="margin-top:0.5rem">
+        <div class="insight-box"><strong>제1기 이론 도입기 (~2009)</strong><br>논문 303편 · #차이 #시뮬라크르 #잠재성<br>플라톤적 재현 체계에 맞서는 존재론적 개념 정초 시기</div>
+        <div class="insight-box"><strong>제2기 학제적 확장기 (2010–2017)</strong><br>논문 686편 · #리좀 #되기 #욕망<br>교육학·영화학·예술비평으로 개념 확산, 학제 간 응용 폭발</div>
+        <div class="insight-box"><strong>제3기 실천적 심화기 (2018–현재)</strong><br>논문 1,010편 · #정동 #탈영토화 #리토르넬로<br>윤리학·정치적 실천으로 전회, 신체와 연대를 묻는 시대</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 연도별 추이 탭 -->
+<div id="trend" class="content">
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3>연도별 논문 발행 추이 (1995–2025)</h3>
+    <canvas id="trendChart" style="max-height:400px"></canvas>
+  </div>
+  <div class="card">
+    <h3>실제 시각화 이미지</h3>
+    <img src="yearly_trend.png" class="chart-img" alt="연도별 발행 추이">
+  </div>
+</div>
+
+<!-- 키워드 분석 탭 -->
+<div id="keywords" class="content">
+  <div class="grid-2">
+    <div class="card">
+      <h3>핵심 키워드 빈도 (전체)</h3>
+      <div class="kw-bar"><div class="kw-label"><span>정동 <span class="period-badge p3">3기</span></span><span>50회</span></div><div class="kw-track"><div class="kw-fill" style="width:100%;background:linear-gradient(90deg,#e879f9,#9d6fff)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>리좀 <span class="period-badge p2">2기</span></span><span>29회</span></div><div class="kw-track"><div class="kw-fill" style="width:58%;background:linear-gradient(90deg,#9d6fff,#7c5ccc)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>되기 <span class="period-badge p2">2기</span></span><span>23회</span></div><div class="kw-track"><div class="kw-fill" style="width:46%;background:linear-gradient(90deg,#9d6fff,#7c5ccc)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>욕망 <span class="period-badge p2">2기</span></span><span>23회</span></div><div class="kw-track"><div class="kw-fill" style="width:46%;background:linear-gradient(90deg,#9d6fff,#7c5ccc)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>감각 <span class="period-badge p3">3기</span></span><span>24회</span></div><div class="kw-track"><div class="kw-fill" style="width:48%;background:linear-gradient(90deg,#e879f9,#9d6fff)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>차이 <span class="period-badge p1">1기</span></span><span>25회</span></div><div class="kw-track"><div class="kw-fill" style="width:50%;background:linear-gradient(90deg,#38bdf8,#0284c7)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>시뮬라크르 <span class="period-badge p1">1기</span></span><span>15회</span></div><div class="kw-track"><div class="kw-fill" style="width:30%;background:linear-gradient(90deg,#38bdf8,#0284c7)"></div></div></div>
+      <div class="kw-bar"><div class="kw-label"><span>반복 <span class="period-badge p1">1기</span></span><span>12회</span></div><div class="kw-track"><div class="kw-fill" style="width:24%;background:linear-gradient(90deg,#38bdf8,#0284c7)"></div></div></div>
+    </div>
+    <div class="card">
+      <h3>시기별 키워드 히트맵</h3>
+      <img src="keyword_by_period.png" class="chart-img" alt="키워드 히트맵">
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <h3>레이더 차트 – 시기별 키워드 점유율</h3>
+    <canvas id="radarChart" style="max-height:360px"></canvas>
+  </div>
+</div>
+
+<!-- 저자 탭 -->
+<div id="authors" class="content">
+  <div class="grid-2">
+    <div class="card">
+      <h3>TOP 10 저자</h3>
+      <div class="author-row"><div class="author-rank" style="color:#ffd700">①</div><div class="author-info"><div class="author-name">신지영</div><div class="author-inst">경상대학교</div></div><div class="author-bar-wrap"><div class="author-bar" style="width:100%"></div></div><span style="font-size:0.85rem;color:#aaa">25편</span></div>
+      <div class="author-row"><div class="author-rank" style="color:#ffd700">①</div><div class="author-info"><div class="author-name">김도남</div><div class="author-inst">서울교육대학교</div></div><div class="author-bar-wrap"><div class="author-bar" style="width:100%"></div></div><span style="font-size:0.85rem;color:#aaa">25편</span></div>
+      <div class="author-row"><div class="author-rank" style="color:#c0c0c0">③</div><div class="author-info"><div class="author-name">이찬웅</div><div class="author-inst">이화여자대학교</div></div><div class="author-bar-wrap"><div class="author-bar" style="width:76%"></div></div><span style="font-size:0.85rem;color:#aaa">19편</span></div>
+      <div class="author-row"><div class="author-rank" style="color:#cd7f32">④</div><div class="author-info"><div class="author-name">서동욱</div><div class="author-inst">서강대학교</div></div><div class="author-bar-wrap"><div class="author-bar" style="width:64%"></div></div><span style="font-size:0.85rem;color:#aaa">16편</span></div>
+      <div class="author-row"><div class="author-rank">⑤</div><div class="author-info"><div class="author-name">박정애</div><div class="author-inst">공주교육대학교</div></div><div class="author-bar-wrap"><div class="author-bar" style="width:60%"></div></div><span style="font-size:0.85rem;color:#aaa">15편</span></div>
+    </div>
+    <div class="card">
+      <h3>저자 분포 시각화</h3>
+      <img src="top_authors.png" class="chart-img" alt="주요 저자 분포">
+      <div class="insight-box" style="margin-top:1rem"><strong>지역적 분산성 확인</strong><br>상위 저자들이 수도권에 집중되지 않고 전국 각지에 분포. 이론적 심화 그룹(신지영·이찬웅·서동욱)과 교육·실천 그룹(김도남·박정애)의 양대 산맥 형성.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 향후 계획 탭 -->
+<div id="plan" class="content">
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3>핵심 연구 질문</h3>
+    <div style="font-size:1.05rem;line-height:1.8;color:#ddd;padding:1rem;border-left:3px solid var(--purple)">"정동과 리토르넬로는 한국 학술 담론에서 어떤 방식으로 번역·전용되었는가, 그리고 그 번역은 들뢰즈 원전의 의미를 심화하는가 아니면 탈문맥화하는가?"</div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>3단계 비교 분석 전략</h3>
+      <div class="insight-box"><strong>① 계보학적 비교</strong><br>스피노자→들뢰즈→마수미→한국 학계로 이어지는 '정동' 개념의 번역 경로 추적</div>
+      <div class="insight-box"><strong>② 쟁점 대조 분석</strong><br>마수미의 자율 정동론 vs 루스 레이스의 비판 vs 한국적 수용 양상 비교</div>
+      <div class="insight-box"><strong>③ 실천적 전망 수립</strong><br>[정동: 신체 강도] → [리토르넬로: 영토화] → [탈영토화: 새로운 배치]</div>
+    </div>
+    <div class="card">
+      <h3>3중 가속과 들뢰즈의 소환</h3>
+      <canvas id="reasonChart" style="max-height:260px"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// 시기별 도넛
+new Chart(document.getElementById('periodChart'),{
+  type:'doughnut',
+  data:{
+    labels:['제1기 도입기 (~2009)','제2기 확장기 (2010–17)','제3기 심화기 (2018–)'],
+    datasets:[{data:[303,686,1010],backgroundColor:['rgba(56,189,248,0.7)','rgba(157,111,255,0.7)','rgba(232,121,249,0.7)'],borderColor:['#38bdf8','#9d6fff','#e879f9'],borderWidth:2,hoverOffset:8}]
+  },
+  options:{plugins:{legend:{labels:{color:'#ccc',font:{size:12}}}},cutout:'65%'}
+});
+
+// 연도별 추이
+const years=['1995','1997','1999','2001','2003','2005','2007','2009','2011','2013','2015','2017','2019','2021','2023','2025'];
+const counts=[1,3,7,12,17,28,42,57,65,80,95,110,112,128,142,159];
+new Chart(document.getElementById('trendChart'),{
+  type:'line',
+  data:{
+    labels:years,
+    datasets:[{label:'연간 논문 수',data:counts,borderColor:'#9d6fff',backgroundColor:'rgba(157,111,255,0.1)',fill:true,tension:0.4,pointBackgroundColor:'#e879f9',pointRadius:5}]
+  },
+  options:{plugins:{legend:{labels:{color:'#ccc'}}},scales:{x:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+});
+
+// 레이더
+new Chart(document.getElementById('radarChart'),{
+  type:'radar',
+  data:{
+    labels:['차이/반복','시뮬라크르','리좀','되기','욕망','정동','감각','탈영토화'],
+    datasets:[
+      {label:'제1기',data:[80,60,10,5,10,0,5,0],borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.15)'},
+      {label:'제2기',data:[30,20,90,75,75,20,25,30],borderColor:'#9d6fff',backgroundColor:'rgba(157,111,255,0.15)'},
+      {label:'제3기',data:[20,10,50,40,40,100,80,70],borderColor:'#e879f9',backgroundColor:'rgba(232,121,249,0.15)'}
+    ]
+  },
+  options:{plugins:{legend:{labels:{color:'#ccc'}}},scales:{r:{ticks:{color:'#888',backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.1)'},pointLabels:{color:'#ccc'}}}}
+});
+
+// 계획 차트
+new Chart(document.getElementById('reasonChart'),{
+  type:'bar',
+  data:{
+    labels:['팬데믹\n탈영토화','AI·알고리즘\n감응 정치','기후위기\n비인간 감응'],
+    datasets:[{label:'들뢰즈 소환 강도',data:[85,90,75],backgroundColor:['rgba(157,111,255,0.6)','rgba(232,121,249,0.6)','rgba(56,189,248,0.6)'],borderColor:['#9d6fff','#e879f9','#38bdf8'],borderWidth:2,borderRadius:8}]
+  },
+  options:{plugins:{legend:{labels:{color:'#ccc'}}},scales:{x:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'},max:100}}}
+});
+</script>
+</body>
+</html>
