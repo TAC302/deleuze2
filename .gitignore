@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+venv/
+.venv/
+
+# 대용량 데이터 파일
+*.xls
+*.xlsx
+
+# 임시 파일
+*.tmp
+*.log
