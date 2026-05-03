@@ -142,9 +142,22 @@ img.cimg{width:100%;border-radius:8px}
 <div id="landscape" class="pane">
   <div class="g2" style="margin-bottom:1.4rem">
     <div class="card">
-      <h3>패널 A — 기관별 논문 생산 TOP 15</h3>
-      <div class="box" style="margin-bottom:0.8rem">직관과 달리 <strong>부산대(99편)</strong>가 1위. 지방 거점 국립대가 수도권 사립대를 앞선 <strong>지역적 분산성</strong> 확인.</div>
-      <div id="instList"></div>
+      <h3>패널 A — 다작 저자와 영향력 저자 비교</h3>
+      <div class="box" style="margin-bottom:0.8rem">가장 많이 쓴 <strong>다작 저자(철학)</strong>와 실제 가장 많이 인용된 <strong>영향력 저자(교육학)</strong>가 완전히 다르게 나타남. <strong>교육학의 압도적 영향력</strong> 확인.</div>
+      <div style="display:flex; gap:1rem; margin-top:1rem;">
+        <div style="flex:1;">
+          <h4 style="font-size:0.8rem; color:#bbb; margin-bottom:0.5rem; border-bottom:1px solid #333; padding-bottom:0.3rem;">최다 논문 저자 (다작)</h4>
+          <div class="inst-row"><span style="color:#ffd700;font-weight:700">①</span><div class="inst-name">김도남</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:100%"></div></div><div class="inst-cnt">25편</div></div>
+          <div class="inst-row"><span style="color:#c0c0c0;font-weight:700">②</span><div class="inst-name">신지영</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:100%"></div></div><div class="inst-cnt">25편</div></div>
+          <div class="inst-row"><span style="color:#cd7f32;font-weight:700">③</span><div class="inst-name">이찬웅</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:76%"></div></div><div class="inst-cnt">19편</div></div>
+        </div>
+        <div style="flex:1;">
+          <h4 style="font-size:0.8rem; color:#bbb; margin-bottom:0.5rem; border-bottom:1px solid #333; padding-bottom:0.3rem;">누적 피인용 (영향력)</h4>
+          <div class="inst-row"><span style="color:#ffd700;font-weight:700">①</span><div class="inst-name" style="color:var(--b)">김재춘(교육)</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:100%; background:linear-gradient(90deg,var(--b),var(--g))"></div></div><div class="inst-cnt">260회</div></div>
+          <div class="inst-row"><span style="color:#c0c0c0;font-weight:700">②</span><div class="inst-name" style="color:var(--b)">배지현(교육)</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:88%; background:linear-gradient(90deg,var(--b),var(--g))"></div></div><div class="inst-cnt">229회</div></div>
+          <div class="inst-row"><span style="color:#cd7f32;font-weight:700">③</span><div class="inst-name">김은주</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:62%; background:linear-gradient(90deg,var(--b),var(--g))"></div></div><div class="inst-cnt">162회</div></div>
+        </div>
+      </div>
     </div>
     <div class="card">
       <h3>패널 A — 저자 네트워크</h3>
