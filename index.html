@@ -164,6 +164,18 @@ img.cimg{width:100%;border-radius:8px}
       <img src="top_authors.png" class="cimg" alt="저자 네트워크 시각화">
       <div class="box" style="margin-top:1rem"><strong>이론과 실천의 양대 산맥</strong><br>이론적 심화 그룹(신지영·이찬웅·서동욱)과 교육·실천 그룹(김도남·박정애)이 명확한 양대 산맥을 형성. 전자는 철학 단독 저술, 후자는 학제간 공저 비율이 높음.</div>
     </div>
+    </div>
+  </div>
+  <div class="g2" style="margin-bottom:1.4rem">
+    <div class="card">
+      <h3>패널 C — 기관별 논문 생산 TOP 15</h3>
+      <div class="box" style="margin-bottom:0.8rem">직관과 달리 <strong>부산대(99편)</strong>가 1위. 지방 거점 국립대가 수도권 사립대를 앞선 <strong>지역적 분산성</strong> 확인.</div>
+      <div id="instList"></div>
+    </div>
+    <div class="card">
+      <h3>패널 C — 기관별 분포 차트</h3>
+      <canvas id="instChart"></canvas>
+    </div>
   </div>
   <div class="g2">
     <div class="card">
@@ -232,6 +244,13 @@ insts.forEach(([nm,n],i)=>{
   il.innerHTML+=`<div class="inst-row">${rank}<div class="inst-name">${nm}</div><div class="inst-bar-wrap"><div class="inst-bar" style="width:${Math.round(n/maxI*100)}%"></div></div><div class="inst-cnt">${n}편</div></div>`;
 });
 
+// 4. Institution bar chart (top 8)
+new Chart(document.getElementById('instChart'),{
+  type:'bar',
+  data:{labels:insts.slice(0,8).map(x=>x[0].replace('대학교','대').replace('한국외국어','외국어')),
+    datasets:[{label:'논문 수',data:insts.slice(0,8).map(x=>x[1]),backgroundColor:'rgba(157,111,255,0.6)',borderColor:'#9d6fff',borderWidth:1,borderRadius:6}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#777'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#bbb'},grid:{display:false}}}}
+});
 
 // 5. Field donut
 const fields=[['철학',321],['기타인문학',199],['영어와문학',164],['교육학',103],['예술일반',93],['학제간연구',80],['한국어와문학',74],['디자인',48],['기타',917]];
