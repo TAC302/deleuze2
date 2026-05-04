@@ -169,7 +169,7 @@ img.cimg{width:100%;border-radius:8px}
   <div class="g2" style="margin-bottom:1.4rem">
     <div class="card">
       <h3>패널 B — 기관별 논문 생산 TOP 15</h3>
-      <div class="box" style="margin-bottom:0.8rem">직관과 달리 <strong>부산대(99편)</strong>가 1위. 지방 거점 국립대가 수도권 사립대를 앞선 <strong>지역적 분산성</strong> 확인.</div>
+      <div class="box" style="margin-bottom:0.8rem">직관과 달리 <strong>부산대(119편)</strong>가 1위. 지방 거점 국립대가 수도권 사립대를 앞선 <strong>지역적 분산성</strong> 확인.</div>
       <div id="instList"></div>
     </div>
     <div class="card">
@@ -235,8 +235,8 @@ new Chart(document.getElementById('trendChart'),{
 });
 
 // 3. Institution list
-const insts=[['부산대학교',99],['서울대학교',80],['홍익대학교',61],['중앙대학교',59],['연세대학교',55],['한국외국어대학교',54],['이화여자대학교',48],['서강대학교',46],['경북대학교',46],['동국대학교',45],['경희대학교',40],['숙명여자대학교',38],['고려대학교',37],['강원대학교',33],['건국대학교',33]];
-const maxI=99;
+const insts=[['부산대학교',119],['서울대학교',114],['홍익대학교',96],['중앙대학교',87],['연세대학교',65],['동국대학교',65],['숙명여자대학교',64],['한국외국어대학교',63],['국민대학교',61],['이화여자대학교',60],['서강대학교',58],['경희대학교',55],['고려대학교',53],['성균관대학교',51],['경북대학교',50]];
+const maxI=119;
 const il=document.getElementById('instList');
 insts.forEach(([nm,n],i)=>{
   const colors=['#ffd700','#c0c0c0','#cd7f32'];
